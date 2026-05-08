@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeHub — Change is constant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:        #020408;
+    --surface:   #0d1117;
+    --surface2:  #161b22;
+    --border:    rgba(255,255,255,0.08);
+    --border-h:  rgba(88,166,255,0.45);
+    --accent:    #58a6ff;
+    --accent2:   #bc8cff;
+    --green:     #3fb950;
+    --green-h:   #52cc65;
+    --text:      #e6edf3;
+    --muted:     rgba(255,255,255,0.45);
+    --muted2:    rgba(255,255,255,0.25);
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ─── NAVBAR ─── */
+  .navbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 40px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(2,4,8,0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: border-color 0.3s;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .nav-logo img {
+    width: 110px;
+    border-radius: 38%;
+    display: block;
+    transition: opacity 0.2s;
+  }
+  .nav-logo img:hover { opacity: 0.85; }
+
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    list-style: none;
+    flex: 1;
+    padding-left: 28px;
+    justify-content: center;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: 500;
+    padding: 7px 13px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: color 0.2s, background 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .nav-links a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+  }
+
+  .nav-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    object-fit: cover;
+    transition: border-color 0.2s;
+  }
+  .nav-avatar:hover { border-color: var(--accent); }
+
+  .btn-brand {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 7px 14px;
+    border-radius: 8px;
+    letter-spacing: 0.03em;
+    transition: color 0.2s, background 0.2s;
+  }
+  .btn-brand:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: calc(100vh - 65px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px 60px;
+    position: relative;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  /* Gradient mesh */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% -10%, rgba(88,28,220,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 45% at 15% 85%, rgba(29,78,216,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse 55% 40% at 85% 80%, rgba(88,28,220,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 35% 35% at 50% 50%, rgba(88,166,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Stars */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.2px 1.2px at 8%  15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px   1px   at 25% 22%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 55% 12%, rgba(255,255,255,0.45) 0%, transparent 100%),
+      radial-gradient(1px   1px   at 78% 18%, rgba(255,255,255,0.3)  0%, transparent 100%),
+      radial-gradient(1px   1px   at 92% 35%, rgba(255,255,255,0.4)  0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 12% 55%, rgba(255,255,255,0.3)  0%, transparent 100%),
+      radial-gradient(1px   1px   at 35% 75%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px   1px   at 68% 65%, rgba(255,255,255,0.3)  0%, transparent 100%),
+      radial-gradient(1.3px 1.3px at 88% 72%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px   1px   at 48% 48%, rgba(255,255,255,0.2)  0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    animation: heroFadeIn 0.9s ease both;
+  }
+
+  @keyframes heroFadeIn {
+    from { opacity:0; transform:translateY(28px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Badge */
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    animation: heroFadeIn 0.9s 0.1s ease both;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.5; transform:scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.6rem, 6.5vw, 4.8rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    color: #fff;
+    margin-bottom: 24px;
+    animation: heroFadeIn 0.9s 0.15s ease both;
+  }
+
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+    font-weight: 400;
+    animation: heroFadeIn 0.9s 0.2s ease both;
+  }
+
+  /* ─── FORM ─── */
+  .hero-form {
+    display: flex;
+    gap: 0;
+    max-width: 520px;
+    margin: 0 auto 14px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    box-shadow: 0 0 0 0 rgba(88,166,255,0);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: heroFadeIn 0.9s 0.25s ease both;
+  }
+  .hero-form:focus-within {
+    border-color: rgba(88,166,255,0.4);
+    box-shadow: 0 0 0 4px rgba(88,166,255,0.08);
+  }
+
+  .hero-form input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 15px 20px;
+    color: #fff;
+    font-size: 0.92rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+  .hero-form input::placeholder { color: var(--muted2); }
+
+  .btn-green {
+    background: linear-gradient(135deg, #238636 0%, #1a6e2a 100%);
+    color: #fff;
+    border: none;
+    padding: 15px 26px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: filter 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .btn-green:hover {
+    filter: brightness(1.15);
+    transform: none;
+  }
+  .btn-green:active { filter: brightness(0.95); }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    animation: heroFadeIn 0.9s 0.3s ease both;
+  }
+
+  .btn-outline-white {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    padding: 13px 26px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.25s, background 0.25s, color 0.25s;
+    letter-spacing: 0.02em;
+  }
+  .btn-outline-white:hover {
+    border-color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+  }
+
+  /* ─── FLOATING CARDS ─── */
+  .float-cards {
+    position: relative;
+    margin-top: 80px;
+    height: 300px;
+    width: 100%;
+    max-width: 880px;
+    animation: heroFadeIn 0.9s 0.4s ease both;
+  }
+
+  .float-card {
+    position: absolute;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    font-size: 0.78rem;
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .float-card:nth-child(1) {
+    left: 0; top: 30px; width: 215px;
+    animation: floatA 7s ease-in-out infinite;
+  }
+  .float-card:nth-child(2) {
+    right: 0; top: 50px; width: 205px;
+    animation: floatB 7s ease-in-out infinite 1.2s;
+  }
+  .float-card:nth-child(3) {
+    left: 50%; top: 10px; width: 245px;
+    animation: floatC 7s ease-in-out infinite 2.4s;
+  }
+
+  @keyframes floatA {
+    0%,100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-14px) rotate(0deg); }
+  }
+  @keyframes floatB {
+    0%,100% { transform: translateY(0) rotate(1deg); }
+    50%      { transform: translateY(-10px) rotate(0deg); }
+  }
+  @keyframes floatC {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-16px); }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+  }
+  .card-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .green  { background: var(--green); box-shadow: 0 0 8px rgba(63,185,80,0.6); }
+  .blue   { background: var(--accent); box-shadow: 0 0 8px rgba(88,166,255,0.6); }
+  .purple { background: var(--accent2); box-shadow: 0 0 8px rgba(188,140,255,0.6); }
+
+  .card-line {
+    height: 7px;
+    border-radius: 4px;
+    margin-bottom: 7px;
+    background: rgba(255,255,255,0.07);
+  }
+  .card-line.w80 { width:80%; }
+  .card-line.w60 { width:60%; }
+  .card-line.w90 { width:90%; }
+  .card-line.w40 { width:40%; }
+  .card-line.accent { background: rgba(88,166,255,0.25); }
+
+  /* Card glow on hover */
+  .float-card:hover {
+    border-color: var(--border-h);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(88,166,255,0.15);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+   
+  
+ 
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 36px 24px;
+    text-align: center;
+    background: var(--bg);
+  }
+  footer p {
+    color: var(--muted2);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+  }
+  footer span.green-text { color: var(--green); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .features  { grid-template-columns: repeat(2,1fr); }
+    .stats     { flex-wrap: wrap; }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .navbar    { padding: 14px 20px; }
+  }
+  @media (max-width: 580px) {
+    .features        { grid-template-columns: 1fr; }
+    .hero-form       { flex-direction: column; border-radius: 12px; }
+    .hero-form input { padding: 14px 18px; }
+    .btn-green       { padding: 13px 18px; }
+    .float-cards     { display: none; }
+  }
+  /* ปรับปรุงส่วนนี้ในไฟล์ index.html */
+@media (max-width: 768px) {
+  nav {
+    padding: 0 15px; /* ลดระยะห่างด้านข้าง */
+    justify-content: center; /* จัดให้อยู่กลางหน้าจอ */
+    height: auto; /* ให้ความสูงปรับตามเนื้อหา */
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .nav-links {
+    gap: 8px; /* ลดระยะห่างระหว่างปุ่มเมนู */
+    flex-wrap: wrap; /* สำคัญ! เพื่อให้เมนูที่ล้น ตกลงมาแถวใหม่ได้ ไม่หายไปข้างๆ */
+    justify-content: center;
+  }
+
+  .nav-links a {
+    padding: 6px 10px; /* ลดขนาดปุ่ม */
+    font-size: 0.75rem; /* ลดขนาดตัวอักษรลงหน่อย */
+  }
+
+  .nav-logo {
+    display: none; /* ในมือถืออาจจะซ่อนโลโก้ไว้ก่อนเพื่อให้เมนูมีที่ว่างมากขึ้น */
+  }
+}
+</style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-logo" href="#">
+      <img src="img/Gemini_Generated_Image_7h2qrh7h2qrh7h2q.png"  alt="CodeHub">
+    </a>
+    <ul class="nav-links">
+      <li><a href="#">HTML</a></li>
+      <li><a href="#">CSS</a></li>
+      <li><a href="#">JavaScript</a></li>
+      <li><a href="#">React</a></li>
+      <li><a href="#">React Native</a></li>
+    </ul>
+    <div class="nav-right">
+      <img src="img/images.jpg" alt="Lucky" class="nav-avatar">
+      <button class="btn-brand">Lucky Website</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Now live on CodeHub
+      </div>
+
+      <h1>The future of building<br><span class="grad">happens together</span></h1>
+
+      <p>Tools and trends evolve, but collaboration endures. With CodeHub, developers, agents, and code come together on one platform.</p>
+
+      <div class="hero-form">
+        <input type="text" placeholder="Enter your name">
+        <button class="btn-green" onclick="log()">Login</button>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn-outline-white">Try Lucky web free</button>
+      </div>
+
+      <!-- Floating cards -->
+      <div class="float-cards">
+
+        <div class="float-card">
+          <div class="card-header">
+            <span class="card-dot green"></span> Main Branch
+          </div>
+          <div class="card-line w90 accent"></div>
+          <div class="card-line w60"></div>
+          <div class="card-line w80"></div>
+          <div class="card-line w40"></div>
+        </div>
+
+        <div class="float-card">
+          <div class="card-header">
+            <span class="card-dot blue"></span> Pull Request
+          </div>
+          <div class="card-line w70 accent"></div>
+          <div class="card-line w50"></div>
+          <div class="card-line w80"></div>
+        </div>
+
+        <div class="float-card">
+          <div class="card-header">
+            <span class="card-dot purple"></span> CI / CD Pipeline
+          </div>
+          <div class="card-line w90"></div>
+          <div class="card-line w70 accent"></div>
+          <div class="card-line w50"></div>
+          <div class="card-line w80"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  
+  
+  <!-- FOOTER -->
+  <footer>
+    <p>Everyone can build the future of the web <span class="green-text">🔥</span></p>
+  </footer>
+
+  <script src="github.js"></script>
+</body>
+</html>
